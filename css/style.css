@@ -181,7 +181,13 @@ html[data-theme="light"] .step-calc{color:#e9efff}
 .btn:hover{filter:brightness(1.08)}
 .btn.sec{background:var(--card2);color:var(--ink);border:1px solid var(--line);box-shadow:none}
 .btn.sm{padding:6px 12px;font-size:12px}
+.btn.gd{background:linear-gradient(135deg,#36d17a,#0fae86)}
+.btn.wn{background:linear-gradient(135deg,#ffc15e,#f0973a);color:#3a2a00}
+.btn.bd{background:linear-gradient(135deg,#ff7b7b,#e84a4a)}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.qbar{height:9px;background:var(--card2);border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:4px 0 16px}
+.qbar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s}
+.field label{min-width:120px;font-size:13px;color:var(--ink-dim);font-weight:600}
 
 /* practice */
 .quiz-input{width:120px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:14px}

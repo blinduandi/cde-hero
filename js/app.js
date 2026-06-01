@@ -23,6 +23,7 @@ const NAVDEF = [
     {id:"probleme", ic:"✅", label:"Probleme rezolvate"},
     {id:"antrenament", ic:"🏋️", label:"Antrenament (auto-verificare)"},
     {id:"intrebari", ic:"🃏", label:"Întrebări examen (flashcards)"},
+    {id:"test", ic:"🧠", label:"Test teorie (învățare)"},
     {id:"formule", ic:"📐", label:"Formule esențiale"},
     {id:"resurse", ic:"🔗", label:"Resurse online"}
   ]}
@@ -71,6 +72,7 @@ const VIEWS = {
       {id:"antrenament",ic:"🏋️",h:"Antrenament cu auto-verificare",p:"Probleme cu valori aleatoare; introduci răspunsul, primești punctaj + soluția."},
       {id:"probleme",ic:"✅",h:"Probleme rezolvate",p:"Toate problemele din pptx-uri, rezolvate pas cu pas."},
       {id:"intrebari",ic:"🃏",h:"Flashcards examen",p:"Întrebări teoretice tip bilet cu răspuns model."},
+      {id:"test",ic:"🧠",h:"Test teorie (învățare)",p:"Te autoevaluezi pe cele 70 de întrebări; reține ce greșești și ți le dă din nou."},
       {id:"t4",ic:"📡",h:"Tema 4 — Tranzistoare bipolare",p:"Cel mai probabil subiect de problemă. Începe aici."},
       {id:"formule",ic:"📐",h:"Formule esențiale",p:"Toate formulele de care ai nevoie, pe o pagină."}
     ];
@@ -204,6 +206,118 @@ const VIEWS = {
       items.forEach((x,i)=>{const c=document.getElementById("fc"+i);c.onclick=()=>c.classList.toggle("flipped");});
     }
     draw();
+  },
+
+  test(){
+    const stats=LS.get("quizstats",{}); // n -> {good,part,bad,seen}
+    const cfg={tema:"all",count:"10",mode:"random"};
+    let queue=[],idx=0,results=[];
+
+    const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+    const masteryScore=n=>{const s=stats[n];if(!s)return -100;return (s.good||0)-(s.part||0)*0.5-(s.bad||0)*2;};
+    const isLearned=q=>{const s=stats[q.n];return s&&(s.good||0)>0&&(s.good||0)>=(s.bad||0);};
+    function pool(){
+      let arr=THEORY_QA.filter(x=>cfg.tema==="all"||x.t===cfg.tema);
+      if(cfg.mode==="weak"){arr=arr.slice().sort((a,b)=>masteryScore(a.n)-masteryScore(b.n));}
+      else{arr=shuffle(arr.slice());}
+      const n=cfg.count==="all"?arr.length:Math.min(parseInt(cfg.count,10),arr.length);
+      return arr.slice(0,n);
+    }
+
+    function renderSetup(){
+      const learned=THEORY_QA.filter(isLearned).length;
+      const temaBtns=`<button class="btn sm tfl" data-t="all">Toate</button>`+[1,2,3,4,5,6].map(t=>`<button class="btn sm sec tfl" data-t="${t}">Tema ${t}</button>`).join("");
+      const countBtns=[["10","10 întrebări"],["20","20 întrebări"],["all","Toate (70)"]].map(([v,l])=>`<button class="btn sm ${v==="10"?"":"sec"} cfl" data-c="${v}">${l}</button>`).join("");
+      const modeBtns=[["random","🎲 Aleator"],["weak","🎯 Întâi cele slabe"]].map(([v,l])=>`<button class="btn sm ${v==="random"?"":"sec"} mfl" data-m="${v}">${l}</button>`).join("");
+      view.innerHTML=`<div class="crumb">Practică</div><h1>🧠 Test teorie (învățare)</h1>
+        <p class="lead">Te testezi pe cele <b>70 de întrebări oficiale</b>: citești întrebarea, încerci să răspunzi din cap (sau scrii), apoi compari cu răspunsul model și te autoevaluezi. Aplicația ține minte ce greșești și ți le dă din nou (modul „Întâi cele slabe").</p>
+        <div class="card">
+          <div class="field"><label>Tema</label><div class="btnrow" id="tflrow">${temaBtns}</div></div>
+          <div class="field"><label>Câte întrebări</label><div class="btnrow" id="cflrow">${countBtns}</div></div>
+          <div class="field"><label>Ordinea</label><div class="btnrow" id="mflrow">${modeBtns}</div></div>
+          <div class="btnrow"><button class="btn" id="startq">▶ Începe testul</button></div>
+          <p style="color:var(--muted);font-size:13px;margin:8px 0 0">Progres total: <b>${learned}/70</b> întrebări știute &nbsp;·&nbsp; <button class="ghost-btn" id="qreset">Resetează scorul</button></p>
+        </div>`;
+      const wireGroup=(rowId,attr,key,parse)=>{
+        const row=document.getElementById(rowId);
+        row.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+          cfg[key]=parse?parse(b.getAttribute(attr)):b.getAttribute(attr);
+          row.querySelectorAll("button").forEach(x=>x.classList.add("sec")); b.classList.remove("sec");
+        });
+      };
+      wireGroup("tflrow","data-t","tema",v=>v==="all"?"all":+v);
+      wireGroup("cflrow","data-c","count");
+      wireGroup("mflrow","data-m","mode");
+      document.getElementById("startq").onclick=()=>{queue=pool();if(!queue.length)return;idx=0;results=[];renderQuestion();};
+      document.getElementById("qreset").onclick=()=>{if(confirm("Resetezi scorul testului de teorie?")){Object.keys(stats).forEach(k=>delete stats[k]);LS.set("quizstats",stats);renderSetup();}};
+    }
+
+    function renderQuestion(){
+      const q=queue[idx];
+      const pct=Math.round(100*idx/queue.length);
+      view.innerHTML=`<div class="crumb">Test teorie · întrebarea ${idx+1} din ${queue.length}</div>
+        <div class="qbar"><div class="qbar-fill" style="width:${pct}%"></div></div>
+        <div class="card">
+          <div><span class="tag">Tema ${q.t}</span> <span class="tag">Î${q.n}</span></div>
+          <h2 style="margin:.3em 0 0">${q.q}</h2>
+          <textarea class="quiz-input" id="qans" rows="3" placeholder="Scrie aici răspunsul tău (opțional), apoi compară-l cu cel model..." style="width:100%;margin-top:12px;resize:vertical"></textarea>
+          <div class="btnrow"><button class="btn" id="reveal">Arată răspunsul model</button></div>
+          <div id="modelans" style="display:none">
+            <div class="answer" style="font-weight:500">${q.a}</div>
+            <p style="color:var(--muted);font-size:13px;margin:14px 0 4px">Cât de bine ai știut?</p>
+            <div class="btnrow">
+              <button class="btn bd" data-g="bad">❌ Nu am știut</button>
+              <button class="btn wn" data-g="part">🟡 Aproape</button>
+              <button class="btn gd" data-g="good">✅ Am știut</button>
+            </div>
+          </div>
+        </div>
+        <div class="btnrow"><button class="btn sec" id="quit">⟵ Renunță</button></div>`;
+      typesetMath(view);
+      const reveal=document.getElementById("reveal"), box=document.getElementById("modelans");
+      reveal.onclick=()=>{box.style.display="block";reveal.style.display="none";};
+      box.querySelectorAll("button[data-g]").forEach(b=>b.onclick=()=>grade(q,b.getAttribute("data-g")));
+      document.getElementById("quit").onclick=()=>renderSetup();
+    }
+
+    function grade(q,g){
+      const s=stats[q.n]||(stats[q.n]={good:0,part:0,bad:0,seen:0});
+      s.seen++; s[g]=(s[g]||0)+1; LS.set("quizstats",stats);
+      results.push({n:q.n,g});
+      idx++;
+      if(idx>=queue.length) renderResults(); else renderQuestion();
+    }
+
+    function renderResults(){
+      const good=results.filter(r=>r.g==="good").length;
+      const part=results.filter(r=>r.g==="part").length;
+      const bad=results.filter(r=>r.g==="bad").length;
+      const score=Math.round(100*(good+0.5*part)/results.length);
+      const review=results.filter(r=>r.g!=="good").map(r=>THEORY_QA.find(x=>x.n===r.n));
+      const reviewHTML=review.length?review.map(q=>`
+        <div class="step" style="border-left-color:var(--warn)">
+          <div><span class="tag">Tema ${q.t}</span> <span class="tag">Î${q.n}</span></div>
+          <b>${q.q}</b>
+          <div class="answer" style="font-weight:500;margin-top:8px">${q.a}</div>
+        </div>`).join(""):`<p>🎉 Le-ai știut pe toate! Felicitări.</p>`;
+      view.innerHTML=`<div class="crumb">Test teorie · rezultat</div><h1>Rezultatul testului</h1>
+        <div class="card" style="text-align:center">
+          <div style="font-size:46px;font-weight:800;line-height:1;color:var(--accent)">${score}%</div>
+          <p style="margin:10px 0 0">✅ știute <b>${good}</b> &nbsp;·&nbsp; 🟡 aproape <b>${part}</b> &nbsp;·&nbsp; ❌ nu ai știut <b>${bad}</b> &nbsp;<span style="color:var(--muted)">(din ${results.length})</span></p>
+          <div class="btnrow" style="justify-content:center;margin-top:14px">
+            ${bad+part>0?`<button class="btn" id="redo">🎯 Reia cele greșite (${bad+part})</button>`:""}
+            <button class="btn sec" id="again">Test nou</button>
+          </div>
+        </div>
+        <h2>De revizuit (${review.length})</h2>
+        ${reviewHTML}`;
+      typesetMath(view);
+      const redo=document.getElementById("redo");
+      if(redo) redo.onclick=()=>{queue=review.slice();idx=0;results=[];renderQuestion();};
+      document.getElementById("again").onclick=()=>renderSetup();
+    }
+
+    renderSetup();
   },
 
   bilet(){
