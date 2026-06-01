@@ -183,7 +183,7 @@ const VIEWS = {
 
   intrebari(){
     view.innerHTML=`<div class="crumb">Practică</div><h1>🃏 Întrebări examen (flashcards)</h1>
-      <p class="lead">Întrebări teoretice tip bilet. Apasă pe card pentru a vedea răspunsul model. Filtrează pe temă.</p>
+      <p class="lead">Cele <b>70 de întrebări oficiale</b> pentru examenul final (lista de pe ELSE/UTM). La examen primești 3 dintre ele + 1 problemă. Apasă pe card pentru răspunsul model. Filtrează pe temă.</p>
       <div class="btnrow" id="qfilter"></div>
       <div id="fcwrap"></div>`;
     const filt=document.getElementById("qfilter");
@@ -197,7 +197,7 @@ const VIEWS = {
       wrap.innerHTML=items.map((x,i)=>`
         <div class="fc" id="fc${i}">
           <div class="fc-inner">
-            <div class="fc-face"><div><span class="tag">Tema ${x.t}</span><h3 style="margin:.4em 0 0">${x.q}</h3><p style="color:var(--muted);font-size:12px;margin-top:10px">(click pentru răspuns)</p></div></div>
+            <div class="fc-face"><div><span class="tag">Tema ${x.t}</span> <span class="tag">Î${x.n}</span><h3 style="margin:.4em 0 0">${x.q}</h3><p style="color:var(--muted);font-size:12px;margin-top:10px">(click pentru răspuns)</p></div></div>
             <div class="fc-face fc-back"><div><span class="tag">Răspuns</span><div>${x.a}</div></div></div>
           </div>
         </div>`).join("");
@@ -223,7 +223,7 @@ const VIEWS = {
           <hr>
           ${b.questions.map((q,i)=>`
             <div class="sol-step">
-              <b>${i+1}. (Tema ${q.t})</b> ${q.q}
+              <b>${i+1}. (Tema ${q.t} · întrebarea oficială Î${q.n})</b> ${q.q}
               <div class="btnrow"><button class="btn sm sec rb" data-i="${i}">Arată răspunsul</button></div>
               <div class="answer" id="ba${i}" style="display:none">${q.a}</div>
             </div>`).join("")}
@@ -258,14 +258,25 @@ const VIEWS = {
       <p class="lead">Surse verificate pentru a te pregăti mai bine. Materialele tale + aceste surse acoperă tot ce poate apărea pe bilet.</p>
 
       <div class="warnbox">
-        <b>Despre biletele exacte:</b> cursul tău este <b>FAF.CDE21.1</b> (lect. <b>Nicolae Magariu</b>), iar biletele de examen se află pe platforma <b>ELSE a UTM</b>, care necesită autentificare — de aceea nu sunt indexate public pe internet. Cel mai bun „set de bilete" îl ai deja aici: pagina <a onclick="go('bilet')" style="cursor:pointer">📝 Bilet model</a> generează nelimitate variante (3 teorii + 1 problemă), iar <a onclick="go('antrenament')" style="cursor:pointer">🏋️ Antrenamentul</a> îți dă probleme cu valori noi de fiecare dată.
+        <b>Despre biletele exacte:</b> cursul tău este <b>FAF.CDE21.1</b> (lect. <b>Nicolae Magariu</b>). <b>Am verificat toate cursurile CDE</b> de pe ELSE și de pe platforma veche moodle.utm.md: <b>biletele numerotate NU sunt publice nicăieri</b> (sunt fie la profesor, fie în spatele login-ului). În schimb, <b>conținutul biletului ESTE public</b>: lista celor <b>70 de întrebări oficiale</b> = partea de teorie, iar <b>deck-urile de seminar</b> = sursa problemei. Pagina <a onclick="go('bilet')" style="cursor:pointer">📝 Bilet model</a> le combină în variante nelimitate (3 teorii + 1 problemă), iar <a onclick="go('intrebari')" style="cursor:pointer">🃏 Întrebări examen</a> conține fix cele 70.
+      </div>
+
+      <h2>📌 Lista oficială + sursele problemelor (publice, fără login)</h2>
+      <div class="card">
+        <ul>
+          <li><b>Lista celor 70 de întrebări de examen</b> — <a href="https://else.fcim.utm.md/mod/resource/view.php?id=51275" target="_blank" rel="noopener">PDF oficial pe ELSE</a> (= exact partea de teorie a biletului; o ai integrată la 🃏 Întrebări examen).</li>
+          <li>Seminar <b>Tranzistoare Bipolare P1</b> — <a href="https://else.fcim.utm.md/mod/resource/view.php?id=58178" target="_blank" rel="noopener">sursa problemelor de polarizare (T1–T7)</a></li>
+          <li>Seminar <b>Tranzistoare Bipolare P2</b> — <a href="https://else.fcim.utm.md/mod/resource/view.php?id=58179" target="_blank" rel="noopener">sursa problemelor „regiunea de funcționare" (R1–R4)</a></li>
+          <li>Seminar <b>Divizoare de tensiune</b> — <a href="https://else.fcim.utm.md/mod/resource/view.php?id=58176" target="_blank" rel="noopener">PDF</a> · <b>Diode</b> — <a href="https://else.fcim.utm.md/mod/resource/view.php?id=58177" target="_blank" rel="noopener">PDF</a> · <b>Legea lui Ohm</b> — <a href="https://else.fcim.utm.md/mod/resource/view.php?id=58175" target="_blank" rel="noopener">PDF</a></li>
+          <li><b>Culegerea UTCluj</b> — soluțiile complete, pas cu pas, pentru problemele R1–R4 (cap. 8) — <a href="https://biblioteca.utcluj.ro/files/carti-online-cu-coperta/191-8.pdf" target="_blank" rel="noopener">PDF gratuit</a></li>
+        </ul>
       </div>
 
       <h2>Platforma cursului (UTM)</h2>
       <div class="card">
         <ul>
-          <li><a href="https://else.fcim.utm.md/course/view.php?id=4930" target="_blank" rel="noopener">ELSE · FAF.CDE21.1 — Circuite și dispozitive electronice</a> (necesită login UTM) — aici sunt cursurile, lucrările de laborator și, de obicei, biletele/subiectele.</li>
-          <li><a href="https://else.fcim.utm.md/course/view.php?id=1683" target="_blank" rel="noopener">ELSE · FCIM.CDE21.4 — varianta de laborator a cursului</a></li>
+          <li><a href="https://else.fcim.utm.md/course/view.php?id=4930" target="_blank" rel="noopener">ELSE · FAF.CDE21.1 — Circuite și dispozitive electronice</a> — aici sunt cursurile (Tema 1–6), deck-urile de seminar și lucrările de laborator (biletele numerotate apar doar pentru studenții înrolați).</li>
+          <li><a href="https://else.fcim.utm.md/course/view.php?id=5425" target="_blank" rel="noopener">ELSE · FCIM.CDE21.5</a> · <a href="https://else.fcim.utm.md/course/view.php?id=1683" target="_blank" rel="noopener">FCIM.CDE21.4</a> — cursuri-geamăn (aceeași listă de 70 de întrebări).</li>
         </ul>
       </div>
 
