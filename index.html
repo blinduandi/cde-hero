@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CDE · 0 → Hero · Pregătire Examen</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="logo">CDE</div>
+      <div class="brand-txt">
+        <strong>0 → Hero</strong>
+        <span>Circuite și Dispozitive Electronice</span>
+      </div>
+    </div>
+
+    <input id="search" type="search" placeholder="🔎 Caută (Ctrl+K)…" autocomplete="off">
+
+    <nav id="nav"></nav>
+
+    <div class="progress-box">
+      <div class="progress-label">Progres învățare <span id="prog-pct">0%</span></div>
+      <div class="progress-bar"><div id="prog-fill"></div></div>
+    </div>
+    <button id="reset-prog" class="ghost-btn" title="Resetează progresul">↺ Resetează progresul</button>
+  </aside>
+
+  <!-- Mobile top bar -->
+  <header id="topbar">
+    <button id="menu-btn" aria-label="Meniu">☰</button>
+    <span>CDE · 0 → Hero</span>
+    <button id="theme-btn" aria-label="Temă">🌓</button>
+  </header>
+
+  <!-- Main -->
+  <main id="main">
+    <div id="view"></div>
+    <footer class="foot">
+      <span>Pregătire examen CDE · UTM · construit din materialele tale</span>
+      <button id="theme-btn2" class="ghost-btn">🌓 Schimbă tema</button>
+    </footer>
+  </main>
+
+  <div id="backdrop"></div>
+</div>
+
+<script src="js/theory.js"></script>
+<script src="js/problems.js"></script>
+<script src="js/schematics.js"></script>
+<script src="js/solvers.js"></script>
+<script src="js/exam.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
