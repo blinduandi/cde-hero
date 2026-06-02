@@ -20,6 +20,7 @@ const NAVDEF = [
     TEME.map(t=>({id:t.id, ic:t.icon, label:"Tema "+t.num+" — "+t.short, tema:true}))
   },
   {group:"Practică", items:[
+    {id:"metoda", ic:"🧭", label:"Cum rezolv problema (pas cu pas)"},
     {id:"probleme", ic:"✅", label:"Probleme rezolvate"},
     {id:"antrenament", ic:"🏋️", label:"Antrenament (auto-verificare)"},
     {id:"intrebari", ic:"🃏", label:"Întrebări examen (flashcards)"},
@@ -69,6 +70,7 @@ const VIEWS = {
   home(){
     const tiles=[
       {id:"bilet",ic:"📝",h:"Simulează un bilet",p:"3 întrebări teoretice + 1 problemă, exact ca la examen."},
+      {id:"metoda",ic:"🧭",h:"Cum rezolv problema (pas cu pas)",p:"Metoda pentru problema de tranzistor: la ce te uiți, ce formulă, când și de ce."},
       {id:"antrenament",ic:"🏋️",h:"Antrenament cu auto-verificare",p:"Probleme cu valori aleatoare; introduci răspunsul, primești punctaj + soluția."},
       {id:"probleme",ic:"✅",h:"Probleme rezolvate",p:"Toate problemele din pptx-uri, rezolvate pas cu pas."},
       {id:"intrebari",ic:"🃏",h:"Flashcards examen",p:"Întrebări teoretice tip bilet cu răspuns model."},
@@ -206,6 +208,142 @@ const VIEWS = {
       items.forEach((x,i)=>{const c=document.getElementById("fc"+i);c.onclick=()=>c.classList.toggle("flipped");});
     }
     draw();
+  },
+
+  metoda(){
+    // Rețete pas cu pas pentru problema de tranzistor bipolar
+    const rDivizor=[
+      {e:"<b>Pas 1 — tensiunea pe bază.</b> Cele două rezistoare din bază formează un <b>divizor de tensiune</b>. Aflăm potențialul bazei cu formula divizorului. (Merge fiindcă I<sub>B</sub> e foarte mic, deci aproape tot curentul trece prin ambele rezistoare.)",
+       c:"U<sub>B</sub> = V<sub>CC</sub> · \\frac{R<sub>B2</sub>}{R<sub>B1</sub>+R<sub>B2</sub>}"},
+      {e:"<b>Pas 2 — tensiunea pe emitor.</b> Între bază și emitor e joncțiunea deschisă, care „mănâncă” 0,7 V. Deci emitorul e cu 0,7 V mai jos decât baza.",
+       c:"U<sub>E</sub> = U<sub>B</sub> − U<sub>BE</sub> = U<sub>B</sub> − 0,7 V"},
+      {e:"<b>Pas 3 — curentul.</b> Prin R<sub>E</sub> trece curentul de emitor, iar tensiunea pe el e chiar U<sub>E</sub>. Legea lui Ohm îl dă. Și I<sub>C</sub> ≈ I<sub>E</sub> (diferă doar cu micul I<sub>B</sub>).",
+       c:"I<sub>E</sub> = \\frac{U<sub>E</sub>}{R<sub>E</sub>} &nbsp;;&nbsp; I<sub>C</sub> ≈ I<sub>E</sub>"},
+      {e:"<b>Pas 4 — tensiunea colector-emitor.</b> Scrii legea tensiunilor pe bucla de ieșire: de la +V<sub>CC</sub> scazi căderile pe R<sub>C</sub> și pe R<sub>E</sub>.",
+       c:"U<sub>CE</sub> = V<sub>CC</sub> − I<sub>C</sub>·R<sub>C</sub> − I<sub>E</sub>·R<sub>E</sub> ≈ V<sub>CC</sub> − I<sub>C</sub>·(R<sub>C</sub>+R<sub>E</sub>)"},
+      {e:"<b>Pas 5 — PSF și verificare.</b> Punctul static e Q(I<sub>C</sub>, U<sub>CE</sub>). Verifici că ești în regiunea activă: U<sub>CE</sub> trebuie să fie între ~0,2 V și V<sub>CC</sub>. Dacă da → corect.",
+       c:"Q(I<sub>C</sub>, U<sub>CE</sub>) &nbsp;cu&nbsp; 0,2 V < U<sub>CE</sub> < V<sub>CC</sub> → <b>activ normal ✓</b>"}
+    ];
+    const rReactie=[
+      {e:"<b>Pas 1 — trucul.</b> Aici R<sub>B</sub> se întoarce de la <b>colector</b> la bază. Prin R<sub>C</sub> trece I<sub>C</sub>+I<sub>B</sub> (și curentul spre bază trece prin R<sub>C</sub>). Aproximăm I<sub>C</sub>+I<sub>B</sub> ≈ I<sub>C</sub>.",
+       c:"I<sub>RC</sub> = I<sub>C</sub> + I<sub>B</sub> ≈ I<sub>C</sub>"},
+      {e:"<b>Pas 2 — legea tensiunilor pe bucla bazei.</b> De la +V<sub>CC</sub>, treci prin R<sub>C</sub>, apoi R<sub>B</sub>, apoi joncțiunea B-E (0,7 V) până la masă.",
+       c:"V<sub>CC</sub> = I<sub>C</sub>·R<sub>C</sub> + I<sub>B</sub>·R<sub>B</sub> + U<sub>BE</sub>"},
+      {e:"<b>Pas 3 — scoți I<sub>B</sub>.</b> Înlocuiești I<sub>C</sub>=β·I<sub>B</sub> și izolezi I<sub>B</sub>. Observă cum R<sub>C</sub> apare „mărit” de β.",
+       c:"I<sub>B</sub> = \\frac{V<sub>CC</sub> − U<sub>BE</sub>}{R<sub>B</sub> + β·R<sub>C</sub>}"},
+      {e:"<b>Pas 4 — restul.</b> Curentul de colector și tensiunea U<sub>CE</sub>.",
+       c:"I<sub>C</sub> = β·I<sub>B</sub> &nbsp;;&nbsp; U<sub>CE</sub> = V<sub>CC</sub> − I<sub>C</sub>·R<sub>C</sub>"},
+      {e:"<b>De ce e bun montajul:</b> dacă din căldură I<sub>C</sub> crește, U<sub>C</sub> scade, deci scade I<sub>B</sub>, care trage I<sub>C</sub> înapoi. Reacția stabilizează singură punctul.",
+       c:"reacție negativă → PSF stabil la temperatură"}
+    ];
+    const rUnaSursa=[
+      {e:"<b>Pas 1 — legea tensiunilor pe bucla bazei.</b> De la +V, prin R<sub>B</sub>, joncțiunea B-E (0,7 V) și R<sub>E</sub> la masă. <b>Atenție:</b> prin R<sub>E</sub> trece I<sub>E</sub>=(β+1)·I<sub>B</sub>, nu I<sub>B</sub>!",
+       c:"V = I<sub>B</sub>·R<sub>B</sub> + U<sub>BE</sub> + I<sub>E</sub>·R<sub>E</sub>"},
+      {e:"<b>Pas 2 — scoți I<sub>B</sub>.</b> Înlocuiești I<sub>E</sub>=(β+1)·I<sub>B</sub>. R<sub>E</sub> apare „mărit” de (β+1) — ăsta e secretul aici.",
+       c:"I<sub>B</sub> = \\frac{V − U<sub>BE</sub>}{R<sub>B</sub> + (β+1)·R<sub>E</sub>}"},
+      {e:"<b>Pas 3 — curenții.</b>",
+       c:"I<sub>C</sub> = β·I<sub>B</sub> &nbsp;;&nbsp; I<sub>E</sub> = (β+1)·I<sub>B</sub> ≈ I<sub>C</sub>"},
+      {e:"<b>Pas 4 — U<sub>CE</sub>.</b> Dacă colectorul e legat direct la +V, atunci U<sub>CE</sub> = V − I<sub>E</sub>·R<sub>E</sub>. Dacă există și R<sub>C</sub>, scazi și I<sub>C</sub>·R<sub>C</sub>.",
+       c:"U<sub>CE</sub> = V − I<sub>C</sub>·R<sub>C</sub> − I<sub>E</sub>·R<sub>E</sub>"}
+    ];
+    const rDouaSurse=[
+      {e:"<b>Pas 1 — curentul de bază.</b> Dacă nu e dat în enunț, îl scoți din bucla bazei cu prima sursă V<sub>1</sub>: V<sub>1</sub> = I<sub>B</sub>·R<sub>1</sub> + U<sub>BE</sub>.",
+       c:"I<sub>B</sub> = \\frac{V<sub>1</sub> − U<sub>BE</sub>}{R<sub>1</sub>}"},
+      {e:"<b>Pas 2 — curentul de colector.</b>",
+       c:"I<sub>C</sub> = β·I<sub>B</sub>"},
+      {e:"<b>Pas 3 — bucla colectorului cu a doua sursă V<sub>2</sub>.</b> Scrii legea tensiunilor pe partea de colector ca să afli U<sub>CE</sub>.",
+       c:"U<sub>CE</sub> = V<sub>2</sub> − I<sub>C</sub>·R<sub>2</sub>"}
+    ];
+    const rRegiune=[
+      {e:"<b>Pas 1 — verifică BLOCAREA.</b> Dacă tensiunea de comandă pe bază e sub pragul de ~0,7 V, tranzistorul nu conduce deloc: e <b>blocat</b>, I<sub>C</sub>=0.",
+       c:"V<sub>I</sub> < v<sub>BE,on</sub> (≈0,7 V) → <b>BLOCARE</b>, I<sub>C</sub>=0"},
+      {e:"<b>Pas 2 — presupune ACTIV și calculează.</b> Dacă a trecut de prag, presupui activ și calculezi curentul și U<sub>CE</sub> (ca la rețetele de sus).",
+       c:"I<sub>C</sub> = β·I<sub>B</sub> → U<sub>CE</sub> = V<sub>Al</sub> − I<sub>C</sub>·(R<sub>C</sub>+R<sub>E</sub>)"},
+      {e:"<b>Pas 3 — verifică SATURAȚIA.</b> Dacă U<sub>CE</sub> calculat iese mai mic decât 0,2 V, înseamnă că tranzistorul nu poate da atâta curent → e <b>saturat</b>. Pui U<sub>CE</sub>=0,2 V și recalculezi curentul real (de saturație).",
+       c:"U<sub>CE</sub> < 0,2 V → <b>SATURAȚIE</b>: &nbsp; I<sub>C,sat</sub> = \\frac{V<sub>Al</sub> − U<sub>CE,sat</sub>}{R<sub>C</sub>+R<sub>E</sub>}"},
+      {e:"<b>Pas 4 — altfel, ACTIV NORMAL.</b> Dacă U<sub>CE</sub> e între 0,2 V și V<sub>Al</sub>, ești în regiunea activă, cu valorile de la pasul 2.",
+       c:"0,2 V < U<sub>CE</sub> < V<sub>Al</sub> → <b>ACTIV NORMAL</b>"},
+      {e:"<b>Pas 5 — domeniul lui V<sub>I</sub> (sau R<sub>C</sub>) pentru activ.</b> Pui condițiile la limită: activ ține de la pragul de conducție (0,7 V) până la valoarea la care intră în saturație. Rezolvi inecuația.",
+       c:"v<sub>BE,on</sub> < V<sub>I</sub> < V<sub>I(saturație)</sub>"}
+    ];
+    const recipe=(title,intro,steps,summary)=>`
+      <h2>${title}</h2>
+      <div class="card">
+        <p style="margin-top:0">${intro}</p>
+        ${stepFlowHTML(steps, summary)}
+      </div>`;
+
+    view.innerHTML=`<div class="crumb">Practică · Metodă</div>
+      <h1>🧭 Cum rezolv problema (pas cu pas)</h1>
+      <p class="lead">Problema de pe bilet (item 4) e aproape mereu un <b>tranzistor bipolar</b>. Aici înveți <b>cum gândești</b>: la ce te uiți, ce rețetă alegi, ce formulă aplici, <b>când și de ce</b>. Apasă „Începe” la fiecare rețetă ca să vezi pașii pe rând.</p>
+
+      <div class="note"><b>⭐ Regula de aur (valabilă la aproape orice problemă):</b><br>
+        <b>1)</b> Presupui că tranzistorul e în <b>regiunea activă normală</b> (cea în care amplifică).<br>
+        <b>2)</b> Folosești <b>U<sub>BE</sub> ≈ 0,7 V</b> și <b>I<sub>C</sub> = β·I<sub>B</sub></b> (iar I<sub>E</sub> = I<sub>C</sub>+I<sub>B</sub> ≈ I<sub>C</sub>).<br>
+        <b>3)</b> Calculezi ce ți se cere.<br>
+        <b>4)</b> La final <b>VERIFICI</b>: dacă 0,2 V < U<sub>CE</sub> < V<sub>CC</sub> → chiar e activ. Dacă nu → refaci ca saturat (U<sub>CE</sub>=0,2 V) sau blocat (I<sub>C</sub>=0).</div>
+
+      <div class="card">
+        <h3 style="margin-top:0">🔍 Pasul 0 — la ce te uiți întâi (alegi rețeta)</h3>
+        <p>Uită-te <b>cum e alimentată BAZA</b> — asta îți spune ce rețetă folosești:</p>
+        <ul>
+          <li><b>Două rezistoare în bază</b> (unul la +V, unul la masă) → <b>Rețeta 1: Divizor.</b> Începi cu U<sub>B</sub>.</li>
+          <li><b>Un rezistor de la COLECTOR la bază</b> → <b>Rețeta 2: Reacție în colector.</b> R<sub>C</sub> „vede” I<sub>C</sub>+I<sub>B</sub>.</li>
+          <li><b>Un singur R de la +V la bază + R<sub>E</sub> în emitor</b> → <b>Rețeta 3: O sursă.</b> Atenție la (β+1)·R<sub>E</sub>.</li>
+          <li><b>Două surse separate</b> (una pe bază, una pe colector) → <b>Rețeta 4.</b> Legea tensiunilor pe fiecare buclă.</li>
+          <li>Întrebarea e „<b>în ce regiune lucrează?</b>” → <b>Rețeta 5:</b> verifici blocare / activ / saturație.</li>
+        </ul>
+        <p style="margin-bottom:0">Și verifică tipul: <b>NPN</b> (săgeata iese din emitor) sau <b>PNP</b> (săgeata intră). Apoi ține minte cele <b>două bucle</b>: una pe <b>bază</b> (ca să afli I<sub>B</sub>) și una pe <b>colector</b> (ca să afli U<sub>CE</sub>).</p>
+      </div>
+
+      ${recipe("Rețeta 1 — Divizor de tensiune în bază (cea mai frecventă)",
+        "<b>Recunoști după:</b> două rezistoare în bază (R<sub>B1</sub> sus la +V<sub>CC</sub>, R<sub>B2</sub> jos la masă), R<sub>C</sub> în colector, R<sub>E</sub> în emitor. Ex: problemele T4, R3, R4.",
+        rDivizor,
+        "<b>Ordinea:</b> U<sub>B</sub> (divizor) → U<sub>E</sub> = U<sub>B</sub>−0,7 → I<sub>E</sub> = U<sub>E</sub>/R<sub>E</sub> ≈ I<sub>C</sub> → U<sub>CE</sub> = V<sub>CC</sub>−I<sub>C</sub>(R<sub>C</sub>+R<sub>E</sub>) → verifici.")}
+
+      ${recipe("Rețeta 2 — Reacție în colector",
+        "<b>Recunoști după:</b> R<sub>B</sub> NU merge la +V<sub>CC</sub>, ci se întoarce de la <b>colector</b> la bază. Ex: problemele T6, T7.",
+        rReactie,
+        "<b>Cheia:</b> I<sub>B</sub> = (V<sub>CC</sub>−0,7) / (R<sub>B</sub>+β·R<sub>C</sub>) → I<sub>C</sub>=β·I<sub>B</sub> → U<sub>CE</sub>=V<sub>CC</sub>−I<sub>C</sub>·R<sub>C</sub>.")}
+
+      ${recipe("Rețeta 3 — O singură sursă, R<sub>B</sub> în bază + R<sub>E</sub>",
+        "<b>Recunoști după:</b> o sursă, un R<sub>B</sub> de la +V la bază, R<sub>E</sub> în emitor (colectorul adesea direct la +V). Ex: problema T3.",
+        rUnaSursa,
+        "<b>Cheia:</b> I<sub>B</sub> = (V−0,7) / (R<sub>B</sub>+(β+1)·R<sub>E</sub>) — NU uita (β+1) la R<sub>E</sub>!")}
+
+      ${recipe("Rețeta 4 — Două surse",
+        "<b>Recunoști după:</b> două surse separate (V<sub>1</sub> spre bază, V<sub>2</sub> spre colector). Uneori I<sub>B</sub> e dat direct. Ex: problemele T1, T2.",
+        rDouaSurse,
+        "<b>Cheia:</b> bucla bazei (cu V<sub>1</sub>) → I<sub>B</sub> → I<sub>C</sub>=β·I<sub>B</sub> → bucla colectorului (cu V<sub>2</sub>) → U<sub>CE</sub>.")}
+
+      ${recipe("Rețeta 5 — „În ce regiune lucrează?” (blocare / activ / saturație)",
+        "<b>Recunoști după:</b> ți se cere regiunea de funcționare pentru o tensiune de comandă V<sub>I</sub> dată (sau domeniul lui V<sub>I</sub>/R<sub>C</sub>). Aici NU presupui activ — <b>verifici</b>. Ex: problemele R1, R2.",
+        rRegiune,
+        "<b>Logica:</b> sub prag → blocare. Peste prag, calculezi U<sub>CE</sub>: dacă < 0,2 V → saturație; altfel → activ normal.")}
+
+      <h2>PNP — ce se schimbă</h2>
+      <div class="card">
+        <p style="margin-top:0">La <b>PNP</b> metoda e <b>identică</b>, doar semnele sunt „pe dos”:</p>
+        <ul>
+          <li>Emitorul e <b>sus</b> (spre +V), curenții circulă invers.</li>
+          <li>Joncțiunea: <b>U<sub>EB</sub> ≈ 0,7 V</b> (emitorul cu 0,7 V <i>peste</i> bază).</li>
+          <li>Folosești <b>U<sub>EC</sub></b> în loc de U<sub>CE</sub> și <b>U<sub>EB</sub></b> în loc de U<sub>BE</sub>.</li>
+          <li><b>Sfat:</b> lucrează cu valori absolute (module) și pune semnul corect la final. Pașii (divizor, reacție etc.) sunt exact aceiași.</li>
+        </ul>
+      </div>
+
+      <div class="warnbox"><b>⚠️ Capcane care te pot costa puncte:</b><br>
+        • <b>(β+1)·R<sub>E</sub></b> în bucla bazei la Rețeta 3 — prin R<sub>E</sub> trece I<sub>E</sub>, nu I<sub>B</sub>. Dar la <b>divizor</b> (Rețeta 1) NU folosești asta: acolo I<sub>E</sub>=U<sub>E</sub>/R<sub>E</sub> direct.<br>
+        • <b>Unități:</b> kΩ × mA = V &nbsp;|&nbsp; µA × kΩ = mV. (Ex: 40 µA × 100 kΩ = 4 V.) Lucrează în <b>kΩ și mA</b> și nu mai pierzi zerourile.<br>
+        • <b>β</b> nu are unitate; I<sub>C</sub>=β·I<sub>B</sub>, iar I<sub>E</sub>=(β+1)·I<sub>B</sub> ≈ I<sub>C</sub>.<br>
+        • <b>Verifică MEREU regiunea la final</b> (0,2 V < U<sub>CE</sub> < V<sub>CC</sub>).<br>
+        • La <b>PNP</b>, atenție la semne; folosește U<sub>EB</sub> și U<sub>EC</sub>.</div>
+
+      <div class="btnrow">
+        <button class="btn" onclick="go('antrenament')">🏋️ Exersează acum (cu auto-verificare)</button>
+        <button class="btn sec" onclick="go('probleme')">✅ Vezi probleme rezolvate</button>
+      </div>`;
+    wireSteps(view);
   },
 
   test(){
