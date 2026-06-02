@@ -501,7 +501,7 @@ const VIEWS = {
 
   formule(){
     view.innerHTML=`<div class="crumb">Referință</div><h1>📐 Formule esențiale</h1>
-      <p class="lead">Toate formulele de care ai nevoie la examen, pe o singură pagină.</p>
+      <p class="lead">Toate formulele de care ai nevoie la examen, grupate pe teme. Sub fiecare scrie <b>când o folosești</b> și de ce.</p>
       ${FORMULE_HTML}`;
   },
 
@@ -719,50 +719,103 @@ function quizHTML(pr,name){
 
 /* ---------- FORMULE ---------- */
 const FORMULE_HTML=`
+<div class="note"><b>💡 Cum folosești foaia:</b> scrie întâi formula, apoi înlocuiește cu cifre. <b>Trucuri de unități:</b> kΩ × mA = V &nbsp;|&nbsp; µA × kΩ = mV &nbsp;|&nbsp; lucrează în <b>kΩ și mA</b> și nu mai pierzi zerourile.</div>
 <div class="grid c2">
-<div class="card"><h3>Bază (Tema 1)</h3>
-<div class="formula">U = R·I &nbsp;|&nbsp; P = U·I = R·I² = \\frac{U²}{R}</div>
-<div class="formula">Serie: R=ΣRₖ &nbsp;|&nbsp; Paralel: \\frac{1}{R}=Σ\\frac{1}{Rₖ}</div>
-<div class="formula">2 paralel: R=\\frac{R₁·R₂}{R₁+R₂}</div>
-<div class="formula">Divizor U: V<sub>Rx</sub>=V<sub>S</sub>·\\frac{R<sub>x</sub>}{R<sub>T</sub>}</div>
-<div class="formula">Sursă reală: I=\\frac{E}{R+r}; U=E−r·I</div>
+
+<div class="card"><h3>⚡ Legi de bază & circuite (Tema 1)</h3>
+<div class="formula">U = R·I</div>
+<div class="fwhen">→ <b>legea lui Ohm</b>, pe orice rezistor. Afli a treia mărime din celelalte două.</div>
+<div class="formula">P = U·I = R·I² = \\frac{U²}{R}</div>
+<div class="fwhen">→ <b>puterea</b> disipată de un rezistor (sau debitată de sursă).</div>
+<div class="formula">Serie: R = ΣR<sub>k</sub></div>
+<div class="fwhen">→ rezistoare <b>cap-la-cap</b> (același curent prin toate); tensiunea se împarte.</div>
+<div class="formula">Paralel: \\frac{1}{R}=Σ\\frac{1}{R<sub>k</sub>} &nbsp;|&nbsp; 2 buc.: R=\\frac{R₁·R₂}{R₁+R₂}</div>
+<div class="fwhen">→ rezistoare între <b>aceleași 2 noduri</b> (aceeași tensiune); rezultatul &lt; cea mai mică.</div>
+<div class="formula">Divizor de tensiune: U<sub>Rx</sub>=U<sub>S</sub>·\\frac{R<sub>x</sub>}{R<sub>T</sub>}</div>
+<div class="fwhen">→ vrei <b>tensiunea pe un rezistor</b> dintr-o serie, fără să calculezi curentul.</div>
+<div class="formula">Divizor de curent: I₁ = I·\\frac{R₂}{R₁+R₂}</div>
+<div class="fwhen">→ vrei <b>curentul pe o ramură</b> din două în paralel (ramura mică ia mai mult).</div>
+<div class="formula">Kirchhoff: ΣI<sub>nod</sub>=0 &nbsp;|&nbsp; ΣE=ΣR·I</div>
+<div class="fwhen">→ circuite <b>ramificate</b>, cu mai multe noduri/ochiuri (curenți diferiți pe ramuri).</div>
+<div class="formula">Sursă reală: I=\\frac{E}{R+r}; &nbsp; U=E−r·I</div>
+<div class="fwhen">→ sursă cu <b>rezistență internă r</b>. La scurtcircuit I=E/r.</div>
 <div class="formula">X<sub>C</sub>=\\frac{1}{2πfC} &nbsp; X<sub>L</sub>=2πfL &nbsp; X<sub>ef</sub>=\\frac{X<sub>max</sub>}{√2}</div>
+<div class="fwhen">→ <b>condensator/bobină în c.a.</b> (reactanțe) și valoarea efectivă a unei sinusoide.</div>
 </div>
 
-<div class="card"><h3>Diode (Tema 2)</h3>
-<div class="formula">i<sub>D</sub>=I<sub>s</sub>(e^{\\frac{u<sub>D</sub>}{V<sub>T</sub>}}−1), V<sub>T</sub>≈25 mV</div>
-<div class="formula">Conducție: I<sub>D</sub>=\\frac{E−V<sub>D</sub>}{R}; V<sub>D</sub>≈0,6 V (Si)</div>
-<div class="formula">R<sub>D</sub>=\\frac{V<sub>D</sub>}{I<sub>D</sub>} (c.c.) &nbsp; r<sub>d</sub>=\\frac{V<sub>T</sub>}{I<sub>D</sub>} (semnal mic)</div>
-<div class="formula">r<sub>D</sub>=\\frac{Δv<sub>D</sub>}{Δi<sub>D</sub>} (semnal mare)</div>
+<div class="card"><h3>🔺 Diode (Tema 2)</h3>
+<div class="formula">i<sub>D</sub>=I<sub>s</sub>(e^{\\frac{u<sub>D</sub>}{V<sub>T</sub>}}−1), &nbsp; V<sub>T</sub>≈25–26 mV</div>
+<div class="fwhen">→ <b>caracteristica diodei</b> (Shockley). Teoretic; rar la calcul direct.</div>
+<div class="formula">Conducție: I<sub>D</sub>=\\frac{E−V<sub>D</sub>}{R}, &nbsp; V<sub>D</sub>≈0,7 V (Si) / 0,3 V (Ge)</div>
+<div class="fwhen">→ <b>diodă în serie cu R și sursă</b>, în conducție: scazi 0,7 V, apoi Ohm.</div>
+<div class="formula">R<sub>cc</sub>=\\frac{V<sub>D</sub>}{I<sub>D</sub>}</div>
+<div class="fwhen">→ <b>rezistența de c.c. (statică)</b> într-un punct de pe caracteristică.</div>
+<div class="formula">r<sub>d</sub>=\\frac{V<sub>T</sub>}{I<sub>D</sub>}</div>
+<div class="fwhen">→ <b>rezistența dinamică (semnal mic)</b> în jurul punctului de funcționare.</div>
+<div class="formula">r<sub>D</sub>=\\frac{Δv<sub>D</sub>}{Δi<sub>D</sub>}</div>
+<div class="fwhen">→ <b>rezistența de semnal mare</b>, calculată din două puncte (variație).</div>
 </div>
 
-<div class="card"><h3>Redresoare (Tema 3)</h3>
-<div class="formula">Mono: V<sub>med</sub>=\\frac{V<sub>max</sub>}{π}</div>
-<div class="formula">Bialt./punte: V<sub>med</sub>=\\frac{2V<sub>max</sub>}{π}</div>
-<div class="formula">τ=R<sub>L</sub>·C (riplu ↓ când τ ↑)</div>
-<div class="formula">\\frac{u₂}{u₁}=\\frac{N₂}{N₁} (transformator)</div>
+<div class="card"><h3>🔌 Surse de alimentare (Tema 3)</h3>
+<div class="formula">Mono: U<sub>med</sub>=\\frac{U<sub>max</sub>}{π} ≈ 0,318·U<sub>max</sub></div>
+<div class="fwhen">→ <b>redresor monoalternanță</b> (1 diodă). Riplu la frecvența rețelei.</div>
+<div class="formula">Bialt./punte: U<sub>med</sub>=\\frac{2U<sub>max</sub>}{π} ≈ 0,637·U<sub>max</sub></div>
+<div class="fwhen">→ <b>bialternanță / punte</b> (2 sau 4 diode). Riplu la frecvență dublă (se filtrează mai ușor).</div>
+<div class="formula">Filtru: τ = R<sub>L</sub>·C</div>
+<div class="fwhen">→ <b>riplul scade când τ crește</b> (condensator mai mare / sarcină mai mare).</div>
+<div class="formula">Transformator: \\frac{u₂}{u₁}=\\frac{N₂}{N₁}</div>
+<div class="fwhen">→ tensiunea din <b>secundar</b> față de primar (raportul spirelor).</div>
+<div class="formula">Stabilizator Zener: R=\\frac{U<sub>in</sub>−U<sub>Z</sub>}{I<sub>Z</sub>+I<sub>S</sub>}</div>
+<div class="fwhen">→ <b>dimensionezi rezistorul serie</b>; tensiunea de ieșire U<sub>ies</sub> ≈ U<sub>Z</sub>.</div>
 </div>
 
-<div class="card"><h3>Tranzistor bipolar (Tema 4)</h3>
+<div class="card"><h3>📡 Tranzistor bipolar (Tema 4) — cel mai important</h3>
 <div class="formula">I<sub>E</sub>=I<sub>C</sub>+I<sub>B</sub> &nbsp; I<sub>C</sub>=β·I<sub>B</sub> &nbsp; I<sub>E</sub>=(β+1)·I<sub>B</sub></div>
+<div class="fwhen">→ <b>mereu</b>: relațiile dintre curenți.</div>
 <div class="formula">β=\\frac{I<sub>C</sub>}{I<sub>B</sub>} &nbsp; α=\\frac{I<sub>C</sub>}{I<sub>E</sub>} &nbsp; β=\\frac{α}{1−α}</div>
-<div class="formula">Divizor: U<sub>B</sub>=V<sub>CC</sub>·\\frac{R<sub>B2</sub>}{R<sub>B1</sub>+R<sub>B2</sub>}</div>
-<div class="formula">I<sub>E</sub>=\\frac{U<sub>B</sub>−U<sub>BE</sub>}{R<sub>E</sub>} ≈ I<sub>C</sub></div>
-<div class="formula">U<sub>CE</sub>=V<sub>CC</sub>−I<sub>C</sub>(R<sub>C</sub>+R<sub>E</sub>)</div>
-<div class="formula">Saturație: I<sub>Cex</sub>=\\frac{V<sub>CC</sub>−V<sub>CEsat</sub>}{R<sub>C</sub>+R<sub>E</sub>}</div>
-<div class="note" style="margin-top:8px">Regiune: I<sub>C</sub>&lt;I<sub>Cex</sub> ⟹ activ; I<sub>C</sub>&gt;I<sub>Cex</sub> ⟹ saturație; V<sub>I</sub>&lt;V<sub>BE,on</sub> ⟹ blocare.</div>
+<div class="fwhen">→ factorii de amplificare; conversie între α și β.</div>
+<div class="formula">U<sub>BE</sub> ≈ 0,7 V (Si) &nbsp;[PNP: U<sub>EB</sub>≈0,7 V]</div>
+<div class="fwhen">→ în <b>regiunea activă</b> (joncțiunea bază-emitor deschisă). De aici pleci mereu.</div>
+<div class="formula">Divizor: U<sub>B</sub>=V<sub>CC</sub>·\\frac{R<sub>B2</sub>}{R<sub>B1</sub>+R<sub>B2</sub>} → U<sub>E</sub>=U<sub>B</sub>−0,7 → I<sub>E</sub>=\\frac{U<sub>E</sub>}{R<sub>E</sub>}≈I<sub>C</sub></div>
+<div class="fwhen">→ <b>Rețeta 1: polarizare cu divizor</b> (2 R în bază + R<sub>E</sub>). Cea mai frecventă.</div>
+<div class="formula">O sursă: I<sub>B</sub>=\\frac{V−U<sub>BE</sub>}{R<sub>B</sub>+(β+1)·R<sub>E</sub>}</div>
+<div class="fwhen">→ <b>Rețeta 3: un R<sub>B</sub> în bază + R<sub>E</sub></b>. NU uita (β+1) la R<sub>E</sub>!</div>
+<div class="formula">Reacție colector: I<sub>B</sub>=\\frac{V<sub>CC</sub>−U<sub>BE</sub>}{R<sub>B</sub>+β·R<sub>C</sub>}</div>
+<div class="fwhen">→ <b>Rețeta 2: R<sub>B</sub> de la colector la bază</b>.</div>
+<div class="formula">U<sub>CE</sub>=V<sub>CC</sub>−I<sub>C</sub>·(R<sub>C</sub>+R<sub>E</sub>)</div>
+<div class="fwhen">→ <b>tensiunea colector-emitor</b> (coordonata PSF), din bucla de ieșire.</div>
+<div class="formula">Dreapta de sarcină: I<sub>C(sat)</sub>=\\frac{V<sub>CC</sub>}{R<sub>C</sub>+R<sub>E</sub>} &nbsp;|&nbsp; U<sub>CE</sub>=V<sub>CC</sub></div>
+<div class="fwhen">→ cele <b>2 capete</b> ale dreptei de sarcină (intersecțiile cu axele): saturație (U<sub>CE</sub>=0) și blocare (I<sub>C</sub>=0).</div>
+<div class="formula">Saturație: I<sub>Cex</sub>=\\frac{V<sub>CC</sub>−V<sub>CE,sat</sub>}{R<sub>C</sub>+R<sub>E</sub>}, &nbsp; V<sub>CE,sat</sub>≈0,2 V</div>
+<div class="fwhen">→ curentul <b>maxim</b> pe care-l poate da; îl folosești la verificarea regiunii.</div>
+<div class="note" style="margin-top:8px"><b>Verifică regiunea:</b> I<sub>C</sub>&lt;I<sub>Cex</sub> ⟹ <b>activ</b>; &nbsp; I<sub>C</sub>≥I<sub>Cex</sub> ⟹ <b>saturație</b>; &nbsp; V<sub>I</sub>&lt;0,7 V ⟹ <b>blocare</b>.</div>
 </div>
 
-<div class="card"><h3>Amplificatoare (Tema 5)</h3>
+<div class="card"><h3>🔊 Amplificatoare (Tema 5)</h3>
 <div class="formula">A<sub>u</sub>=\\frac{U<sub>ies</sub>}{U<sub>in</sub>} &nbsp; A[dB]=20·log₁₀A<sub>u</sub></div>
-<div class="formula">EC: A<sub>u</sub>≈−g<sub>m</sub>·R<sub>C</sub> (defazaj 180°)</div>
-<div class="formula">B=f<sub>S</sub>−f<sub>J</sub> &nbsp; PAB=A·B</div>
-<div class="formula">Reacție: A=\\frac{a}{1+af}; F=1+af</div>
+<div class="fwhen">→ <b>factorul de amplificare</b> (și exprimat în decibeli).</div>
+<div class="formula">g<sub>m</sub>=\\frac{I<sub>C</sub>}{V<sub>T</sub>} &nbsp; r<sub>be</sub>=\\frac{β·V<sub>T</sub>}{I<sub>C</sub>}</div>
+<div class="fwhen">→ parametri de <b>semnal mic</b>: transconductanța și rezistența de intrare a bazei.</div>
+<div class="formula">EC: A<sub>u</sub>≈−g<sub>m</sub>·R<sub>C</sub></div>
+<div class="fwhen">→ etaj <b>emitor comun</b> (semnul − = defazaj 180°). Amplifică mult.</div>
+<div class="formula">CC: A<sub>u</sub>≈1 &nbsp; Z<sub>in</sub>≈β·R<sub>E</sub></div>
+<div class="fwhen">→ <b>repetor pe emitor</b> (colector comun): adaptor, intrare mare, ieșire mică.</div>
+<div class="formula">B=f<sub>S</sub>−f<sub>J</sub> &nbsp; PAB=A·B≈const</div>
+<div class="fwhen">→ <b>banda</b> (la −3 dB) și produsul amplificare × bandă.</div>
+<div class="formula">Reacție: A=\\frac{a}{1+a·f} &nbsp; F=1+a·f</div>
+<div class="fwhen">→ <b>reacție negativă</b>: câștigul scade de F ori, dar câștigi stabilitate și bandă.</div>
+<div class="formula">Randament: clasa A ≤ 50% &nbsp; clasa B ≈ 78%</div>
+<div class="fwhen">→ <b>clasele</b> de amplificare de putere.</div>
 </div>
 
-<div class="card"><h3>FET (Tema 6)</h3>
-<div class="formula">I<sub>D</sub>=I<sub>DSS</sub>(1−\\frac{V<sub>GS</sub>}{V<sub>GS(off)</sub>})²</div>
-<div class="note">FET: comandat în <b>tensiune</b>, Z<sub>in</sub> foarte mare, unipolar. BJT: comandat în curent, bipolar.</div>
+<div class="card"><h3>🎛️ Tranzistoare cu efect de câmp (Tema 6)</h3>
+<div class="formula">JFET: I<sub>D</sub>=I<sub>DSS</sub>(1−\\frac{V<sub>GS</sub>}{V<sub>P</sub>})²</div>
+<div class="fwhen">→ <b>TEC-J</b> în saturație. V<sub>P</sub> = tensiunea de blocare; I<sub>DSS</sub> = curent max (la V<sub>GS</sub>=0).</div>
+<div class="formula">MOS indus: I<sub>D</sub>=k(V<sub>GS</sub>−V<sub>T</sub>)², &nbsp; V<sub>GS</sub>>V<sub>T</sub></div>
+<div class="fwhen">→ <b>MOSFET cu canal indus</b>; conduce doar peste pragul V<sub>T</sub>.</div>
+<div class="formula">Polarizare: V<sub>G</sub>=V<sub>DD</sub>·\\frac{R<sub>G2</sub>}{R<sub>G1</sub>+R<sub>G2</sub>}; &nbsp; V<sub>GS</sub>=V<sub>G</sub>−I<sub>D</sub>·R<sub>S</sub></div>
+<div class="fwhen">→ <b>divizor în grilă + R<sub>S</sub></b> (analog cu divizorul de la BJT).</div>
+<div class="note">FET = comandat în <b>tensiune</b>, Z<sub>in</sub> uriașă, unipolar. BJT = comandat în <b>curent</b>, bipolar.</div>
 </div>
 </div>`;
 
