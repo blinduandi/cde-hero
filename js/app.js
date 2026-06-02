@@ -266,10 +266,12 @@ const VIEWS = {
       {e:"<b>Pas 5 — domeniul lui V<sub>I</sub> (sau R<sub>C</sub>) pentru activ.</b> Pui condițiile la limită: activ ține de la pragul de conducție (0,7 V) până la valoarea la care intră în saturație. Rezolvi inecuația.",
        c:"v<sub>BE,on</sub> < V<sub>I</sub> < V<sub>I(saturație)</sub>"}
     ];
-    const recipe=(title,intro,steps,summary)=>`
+    const recipe=(title,intro,schema,steps,summary)=>`
       <h2>${title}</h2>
       <div class="card">
         <p style="margin-top:0">${intro}</p>
+        ${schemHTML(schema)}
+        <div class="schem-cap">↑ așa arată schema acestui tip — învață să o recunoști dintr-o privire</div>
         ${stepFlowHTML(steps, summary)}
       </div>`;
 
@@ -298,26 +300,31 @@ const VIEWS = {
 
       ${recipe("Rețeta 1 — Divizor de tensiune în bază (cea mai frecventă)",
         "<b>Recunoști după:</b> două rezistoare în bază (R<sub>B1</sub> sus la +V<sub>CC</sub>, R<sub>B2</sub> jos la masă), R<sub>C</sub> în colector, R<sub>E</sub> în emitor. Ex: problemele T4, R3, R4.",
+        {type:"bjt_div",npn:true,Vcc:"10V",Rb1:"56k",Rb2:"12k",Rc:"2.2k",Re:"560Ω"},
         rDivizor,
         "<b>Ordinea:</b> U<sub>B</sub> (divizor) → U<sub>E</sub> = U<sub>B</sub>−0,7 → I<sub>E</sub> = U<sub>E</sub>/R<sub>E</sub> ≈ I<sub>C</sub> → U<sub>CE</sub> = V<sub>CC</sub>−I<sub>C</sub>(R<sub>C</sub>+R<sub>E</sub>) → verifici.")}
 
       ${recipe("Rețeta 2 — Reacție în colector",
         "<b>Recunoști după:</b> R<sub>B</sub> NU merge la +V<sub>CC</sub>, ci se întoarce de la <b>colector</b> la bază. Ex: problemele T6, T7.",
+        {type:"bjt_feedback",npn:true,Vcc:"10V",Rc:"3.3k",Rb:"100k"},
         rReactie,
         "<b>Cheia:</b> I<sub>B</sub> = (V<sub>CC</sub>−0,7) / (R<sub>B</sub>+β·R<sub>C</sub>) → I<sub>C</sub>=β·I<sub>B</sub> → U<sub>CE</sub>=V<sub>CC</sub>−I<sub>C</sub>·R<sub>C</sub>.")}
 
       ${recipe("Rețeta 3 — O singură sursă, R<sub>B</sub> în bază + R<sub>E</sub>",
         "<b>Recunoști după:</b> o sursă, un R<sub>B</sub> de la +V la bază, R<sub>E</sub> în emitor (colectorul adesea direct la +V). Ex: problema T3.",
+        {type:"bjt_singleRE",Vcc:"12V",Rb:"560k",Re:"1k"},
         rUnaSursa,
         "<b>Cheia:</b> I<sub>B</sub> = (V−0,7) / (R<sub>B</sub>+(β+1)·R<sub>E</sub>) — NU uita (β+1) la R<sub>E</sub>!")}
 
       ${recipe("Rețeta 4 — Două surse",
         "<b>Recunoști după:</b> două surse separate (V<sub>1</sub> spre bază, V<sub>2</sub> spre colector). Uneori I<sub>B</sub> e dat direct. Ex: problemele T1, T2.",
+        {type:"bjt_2supply",npn:true,V1:"5V",R1:"100k",V2:"12V",Rc:"1k"},
         rDouaSurse,
         "<b>Cheia:</b> bucla bazei (cu V<sub>1</sub>) → I<sub>B</sub> → I<sub>C</sub>=β·I<sub>B</sub> → bucla colectorului (cu V<sub>2</sub>) → U<sub>CE</sub>.")}
 
       ${recipe("Rețeta 5 — „În ce regiune lucrează?” (blocare / activ / saturație)",
         "<b>Recunoști după:</b> ți se cere regiunea de funcționare pentru o tensiune de comandă V<sub>I</sub> dată (sau domeniul lui V<sub>I</sub>/R<sub>C</sub>). Aici NU presupui activ — <b>verifici</b>. Ex: problemele R1, R2.",
+        {type:"bjt_region",npn:true,VAl:"15V",Rc:"7.5k",Re:"5k"},
         rRegiune,
         "<b>Logica:</b> sub prag → blocare. Peste prag, calculezi U<sub>CE</sub>: dacă < 0,2 V → saturație; altfel → activ normal.")}
 
